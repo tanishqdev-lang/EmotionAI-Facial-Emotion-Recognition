@@ -18,8 +18,10 @@ os.makedirs(DIAGRAMS_DIR, exist_ok=True)
 
 def generate_pipeline_architecture():
     """Generates the End-to-End System Architecture Diagram."""
-    fig, ax = plt.subplots(figsize=(13, 4.5), facecolor='#FFFFFF')
+    fig, ax = plt.subplots(figsize=(13, 4.0), facecolor='#FFFFFF', dpi=150)
     ax.set_facecolor('#FFFFFF')
+    ax.set_xlim(0, 13.5)
+    ax.set_ylim(0, 4.0)
     ax.axis('off')
 
     stages = [
@@ -32,11 +34,10 @@ def generate_pipeline_architecture():
     ]
 
     for i, (title, color) in enumerate(stages):
-        x = i * 2.1 + 0.3
-        # Box
+        x = i * 2.15 + 0.4
         rect = patches.FancyBboxPatch(
-            (x, 1.2), 1.7, 1.8,
-            boxstyle="round,pad=0.2",
+            (x, 1.1), 1.75, 1.8,
+            boxstyle="round,pad=0.15",
             facecolor=color,
             edgecolor='#2C3E50',
             linewidth=1.8,
@@ -44,54 +45,54 @@ def generate_pipeline_architecture():
         )
         ax.add_patch(rect)
         ax.text(
-            x + 0.85, 2.1, title,
+            x + 0.87, 2.0, title,
             ha='center', va='center',
-            fontsize=10.5, fontweight='bold', color='#FFFFFF'
+            fontsize=9.5, fontweight='bold', color='#FFFFFF'
         )
 
-        # Arrow to next stage
         if i < len(stages) - 1:
             ax.annotate(
                 '',
-                xy=(x + 2.05, 2.1),
-                xytext=(x + 1.75, 2.1),
+                xy=(x + 2.12, 2.0),
+                xytext=(x + 1.80, 2.0),
                 arrowprops=dict(
                     arrowstyle="-|>",
                     color='#2C3E50',
-                    lw=2.5,
-                    mutation_scale=18
+                    lw=2.2,
+                    mutation_scale=14
                 )
             )
 
-    plt.title("EmotionAI End-to-End Processing Architecture", fontsize=15, fontweight='bold', pad=20, color='#2C3E50')
-    plt.tight_layout()
+    plt.title("EmotionAI End-to-End Processing Architecture", fontsize=13, fontweight='bold', pad=16, color='#2C3E50')
     output_path = os.path.join(DIAGRAMS_DIR, "system_architecture.png")
-    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
-    print("Saved:", output_path)
+    print("Saved clean:", output_path)
 
 
 def generate_cnn_layer_diagram():
     """Generates the Deep CNN Detailed Layer Diagram."""
-    fig, ax = plt.subplots(figsize=(14, 5), facecolor='#FFFFFF')
+    fig, ax = plt.subplots(figsize=(14, 4.5), facecolor='#FFFFFF', dpi=150)
     ax.set_facecolor('#FFFFFF')
+    ax.set_xlim(0, 13.5)
+    ax.set_ylim(0, 4.5)
     ax.axis('off')
 
     layers = [
-        ("Input\n48x48x1", 0.6, 2.2, 0.9, 2.2, "#34495E"),
-        ("Conv1 + ReLU\n64 filters 5x5", 2.0, 1.8, 1.1, 3.0, "#3498DB"),
-        ("MaxPool1 + LRN\n3x3 s=2 (24x24)", 3.6, 2.0, 1.1, 2.6, "#2980B9"),
-        ("Conv2 + ReLU\n64 filters 3x3", 5.2, 2.0, 1.1, 2.6, "#E67E22"),
-        ("LRN + MaxPool2\n3x3 s=2 (12x12)", 6.8, 2.2, 1.1, 2.2, "#D35400"),
-        ("FC 1 + ReLU\n384 Nodes", 8.4, 2.4, 1.0, 1.8, "#9B59B6"),
-        ("FC 2\n192 Nodes", 9.9, 2.6, 1.0, 1.4, "#8E44AD"),
-        ("Softmax\n7 Emotions", 11.4, 2.8, 1.0, 1.0, "#27AE60"),
+        ("Input\n48x48x1", 0.4, 2.2, 1.0, 2.0, "#34495E"),
+        ("Conv1 + ReLU\n64 filters 5x5", 1.9, 2.2, 1.2, 2.4, "#3498DB"),
+        ("MaxPool1 + LRN\n3x3 s=2 (24x24)", 3.6, 2.2, 1.2, 2.2, "#2980B9"),
+        ("Conv2 + ReLU\n64 filters 3x3", 5.3, 2.2, 1.2, 2.2, "#E67E22"),
+        ("LRN + MaxPool2\n3x3 s=2 (12x12)", 7.0, 2.2, 1.2, 2.0, "#D35400"),
+        ("FC 1 + ReLU\n384 Nodes", 8.7, 2.2, 1.1, 1.8, "#9B59B6"),
+        ("FC 2\n192 Nodes", 10.3, 2.2, 1.1, 1.6, "#8E44AD"),
+        ("Softmax\n7 Emotions", 11.9, 2.2, 1.1, 1.4, "#27AE60"),
     ]
 
     for (name, x, y, w, h, color) in layers:
         rect = patches.FancyBboxPatch(
             (x, y - h/2), w, h,
-            boxstyle="round,pad=0.15",
+            boxstyle="round,pad=0.12",
             facecolor=color,
             edgecolor='#1A252F',
             linewidth=1.5,
@@ -101,10 +102,9 @@ def generate_cnn_layer_diagram():
         ax.text(
             x + w/2, y, name,
             ha='center', va='center',
-            fontsize=9.5, fontweight='bold', color='#FFFFFF'
+            fontsize=8.5, fontweight='bold', color='#FFFFFF'
         )
 
-    # Connecting arrows
     for i in range(len(layers) - 1):
         x_curr = layers[i][1] + layers[i][3]
         x_next = layers[i+1][1]
@@ -116,17 +116,16 @@ def generate_cnn_layer_diagram():
             arrowprops=dict(
                 arrowstyle="-|>",
                 color='#7F8C8D',
-                lw=2.0,
-                mutation_scale=14
+                lw=1.8,
+                mutation_scale=12
             )
         )
 
-    plt.title("Custom Deep Convolutional Neural Network (deepnn) Layer Flow", fontsize=14, fontweight='bold', pad=22, color='#2C3E50')
-    plt.tight_layout()
+    plt.title("Custom Deep Convolutional Neural Network (deepnn) Layer Flow", fontsize=13, fontweight='bold', pad=16, color='#2C3E50')
     output_path = os.path.join(DIAGRAMS_DIR, "cnn_layers_diagram.png")
-    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
-    print("Saved:", output_path)
+    print("Saved clean:", output_path)
 
 
 def generate_confusion_matrix_diagram():

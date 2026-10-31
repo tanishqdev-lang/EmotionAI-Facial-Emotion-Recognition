@@ -8,8 +8,15 @@ detection and affective computing using Deep Convolutional Neural Networks.
 import os
 import sys
 import time
+import warnings
 from datetime import datetime
+
+# Filter benign deprecation and image size warnings
+warnings.filterwarnings('ignore')
+
 from PIL import Image
+Image.MAX_IMAGE_PIXELS = None
+
 import cv2
 import numpy as np
 import pandas as pd
