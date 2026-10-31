@@ -40,11 +40,11 @@ def run_tests():
     print(f"  -> Passed: NumPy engine inference returned '{res_np['emotion']}' with {res_np['confidence']:.2f}% confidence.")
 
     # 3. Test Preprocessing & Face Detection on Benchmark Sample
-    print("[3/6] Testing Preprocessing & Face Detection on 'amazingkelly.jpeg'...")
+    print("[3/6] Testing Preprocessing & Face Detection on 'happy_tg.jpg'...")
     preprocessor = FacePreprocessor()
-    sample_path = os.path.join(PROJECT_ROOT, "assets", "samples", "amazingkelly.jpeg")
+    sample_path = os.path.join(PROJECT_ROOT, "assets", "samples", "happy_tg.jpg")
     img_bgr = cv2.imread(sample_path)
-    assert img_bgr is not None, "Sample image amazingkelly.jpeg must exist"
+    assert img_bgr is not None, "Sample image happy_tg.jpg must exist"
 
     rois = preprocessor.extract_face_rois(img_bgr)
     assert len(rois) > 0, "At least one face ROI must be extracted"
@@ -56,7 +56,7 @@ def run_tests():
     assert len(predictions) > 0, "Must return predictions"
     top_pred = predictions[0]
     print(f"  -> Passed: Top Emotion: {top_pred['emotion'].capitalize()} ({top_pred['confidence']:.2f}%)")
-    assert top_pred['emotion'] == 'surprised', "amazingkelly.jpeg must be classified as 'surprised'"
+    assert top_pred['emotion'] == 'happy', "happy_tg.jpg must be classified as 'happy'"
     assert annotated_bgr.shape == img_bgr.shape, "Annotated image dimensions must match input"
 
     # 5. Test Robust Error Handling & Fallback

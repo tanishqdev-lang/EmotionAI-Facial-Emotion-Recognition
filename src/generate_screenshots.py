@@ -22,7 +22,7 @@ from src.utils import generate_probability_bar_chart, generate_radar_chart, EMOT
 
 def generate_app_screenshots():
     predictor = EmotionPredictor()
-    sample_img_path = os.path.join(PROJECT_ROOT, "assets", "samples", "amazingkelly.jpeg")
+    sample_img_path = os.path.join(PROJECT_ROOT, "assets", "samples", "happy_tg.jpg")
     img_bgr = cv2.imread(sample_img_path)
     if img_bgr is None:
         print("Sample image not found!")
