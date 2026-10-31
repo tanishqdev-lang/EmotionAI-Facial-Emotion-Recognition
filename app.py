@@ -306,20 +306,53 @@ def main():
     # TAB 2: REAL-TIME WEBCAM (DUAL MODES)
     with tab_camera:
         st.markdown("#### Real-Time Facial Emotion Recognition via Camera")
-        st.caption("Select your preferred camera mode below:")
+        st.caption("Select the appropriate camera mode for your device:")
 
         cam_mode = st.radio(
             "Camera Mode Selection:",
-            ["🔴 Live Video Stream (Continuous Webcam Feed)", "📸 Browser Camera Snapshot (Single Capture)"],
+            [
+                "📱 Mobile & Web Camera (Recommended for iOS, Android & Cloud)",
+                "💻 Desktop USB Video Stream (Local Workstation Only)"
+            ],
+            index=0,
             horizontal=True,
             key="cam_mode_radio"
         )
 
-        # MODE 1: CONTINUOUS LIVE WEBCAM STREAM
-        if "Live Video Stream" in cam_mode:
+        # MODE 1: MOBILE & WEB BROWSER CAMERA (CROSS-PLATFORM)
+        if "Mobile & Web Camera" in cam_mode:
             st.markdown("---")
-            col_ctrl1, col_ctrl2, col_ctrl3 = st.columns([1.5, 1.5, 3])
+            st.markdown("##### 📱 Real-Time Device Camera")
+            st.caption("Works on **iOS (iPhone/iPad)**, **Android**, and desktop browsers. When prompted by your phone or browser, tap **'Allow'** to enable camera access.")
+
+            try:
+                camera_photo = st.camera_input("Take a photo to classify facial emotion", key="webcam_snapshot_widget")
+                if camera_photo is not None:
+                    pil_img = Image.open(camera_photo).convert("RGB")
+                    img_np = np.array(pil_img)
+                    img_bgr = img_np[:, :, ::-1].copy()
+
+                    with st.spinner("Analyzing facial expressions..."):
+                        predictions, annotated_bgr = predictor.predict_image(img_bgr)
+                        annotated_rgb = annotated_bgr[:, :, ::-1]
+
+                    render_prediction_results(predictions, pil_img, annotated_rgb, source="Mobile Camera", key_prefix="cam_mobile")
+            except Exception as e:
+                st.error(f"⚠️ Camera access error: {e}")
+                st.markdown("""
+                **Troubleshooting on iOS / Android:**
+                1. **iOS Safari:** Go to **Settings > Safari > Camera** and ensure it is set to **Ask** or **Allow**.
+                2. **Android Chrome:** Tap the **lock/tune icon** in the address bar and ensure **Camera permission** is set to **Allow**.
+                3. Reload the page after updating permissions.
+                """)
+
+        # MODE 2: LOCAL DESKTOP USB STREAM (OPENCV)
+        else:
+            st.markdown("---")
+            st.markdown("##### 💻 Local Workstation Continuous Stream")
+            st.info("💡 **Notice:** This mode requires a physical webcam connected to the computer hosting the server. For smartphones (iOS/Android) or cloud-hosted web links, use the **Mobile & Web Camera** mode above.")
             
+            col_ctrl1, col_ctrl2, col_ctrl3 = st.columns([1.5, 1.5, 3])
             with col_ctrl1:
                 cam_index = st.selectbox("Select Camera Device Index:", [0, 1, 2], index=0, key="cam_device_idx")
             with col_ctrl2:
@@ -330,11 +363,10 @@ def main():
 
             if stream_active:
                 cap = cv2.VideoCapture(cam_index)
-                # Allow camera to warm up
                 if not cap.isOpened():
-                    st.error(f"❌ Could not access Camera Index {cam_index}. Please verify that the camera is plugged in and not currently open in another program (e.g. Zoom, Teams, Skype, or Windows Camera app).")
+                    st.warning(f"ℹ️ Could not find a physical USB webcam at index {cam_index} on this server. If you are accessing this application from a smartphone or cloud URL, please switch to the **'Mobile & Web Camera'** mode above to use your phone's camera directly.")
                 else:
-                    st.success("🟢 Camera connected! Streaming live video... (Uncheck the box above to stop)")
+                    st.success("🟢 Physical camera connected! Streaming live video... (Uncheck the box above to stop)")
                     stop_button = st.button("⏹️ Stop Stream Now", key="stop_stream_btn")
 
                     fps_time = time.time()
@@ -376,40 +408,13 @@ def main():
             else:
                 st.info("💡 Click **'Start Live Webcam Stream'** above to launch continuous real-time facial recognition.")
 
-        # MODE 2: BROWSER SNAPSHOT
-        else:
-            st.markdown("---")
-            st.markdown("##### Capture a Browser Snapshot")
-            st.caption("Takes a photo using your web browser's camera. Ensure you allow camera permissions in your browser address bar.")
-
-            try:
-                camera_photo = st.camera_input("Take a snapshot to classify emotion", key="webcam_snapshot_widget")
-                if camera_photo is not None:
-                    pil_img = Image.open(camera_photo).convert("RGB")
-                    img_np = np.array(pil_img)
-                    img_bgr = img_np[:, :, ::-1].copy()
-
-                    with st.spinner("Running deep neural network on camera frame..."):
-                        predictions, annotated_bgr = predictor.predict_image(img_bgr)
-                        annotated_rgb = annotated_bgr[:, :, ::-1]
-
-                    render_prediction_results(predictions, pil_img, annotated_rgb, source="Webcam Snapshot", key_prefix="cam_snap")
-            except Exception as e:
-                st.error(f"⚠️ Camera capture error: {e}")
-                st.markdown("""
-                **Common solutions:**
-                1. Check that your browser permissions allow camera access on `http://localhost:8501`.
-                2. Close other applications using your webcam (Zoom, Teams, Discord, Skype).
-                3. Switch to **'Live Video Stream'** above for direct hardware webcam access.
-                """)
-
         # Camera Troubleshooting Guide Accordion
         with st.expander("🛠️ Camera Troubleshooting & Permissions Guide"):
             st.markdown("""
-            - **Browser Permissions Blocked:** In Chrome or Edge, click the lock/settings icon on the left side of the URL bar (`localhost:8501`) and ensure **Camera** is set to **Allow**.
-            - **Camera Busy / In Use:** On Windows, only one application can hold a lock on the camera device at a time. If the camera light turns on but no video displays, close other video applications.
-            - **Multiple Cameras:** If you have an external USB webcam or virtual camera (e.g., OBS, DroidCam), toggle the **Camera Device Index** between `0` and `1`.
-            - **Native Desktop Camera Window:** You can also run the dedicated native desktop camera script directly via `py -3.13 realtime_webcam.py` in your terminal!
+            - **Mobile Permissions (iPhone / Android):** When opening the web link, ensure you tap **'Allow'** when your phone asks for camera permission.
+            - **iOS Safari Settings:** On iOS, make sure Safari has permission under **Settings > Safari > Camera**.
+            - **Local Desktop Cameras:** If running locally on your laptop, ensure no other video app (Zoom, Teams) is using your webcam.
+            - **Native Desktop App:** You can also run `py -3.13 realtime_webcam.py` in your terminal for a standalone 60 FPS window.
             """)
 
     # TAB 3: SAMPLE GALLERY
