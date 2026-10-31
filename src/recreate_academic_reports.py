@@ -185,9 +185,10 @@ def generate_cu_docx():
     if os.path.exists(CU_LOGO):
         p_logo = doc.add_paragraph()
         p_logo.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_logo.paragraph_format.space_after = Pt(16)
+        p_logo.paragraph_format.space_before = Pt(10)
+        p_logo.paragraph_format.space_after = Pt(14)
         run_logo = p_logo.add_run()
-        run_logo.add_picture(CU_LOGO, width=Inches(3.8))
+        run_logo.add_picture(CU_LOGO, width=Inches(3.2))
 
     add_p("Chandigarh University", bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=4, size=13)
     add_p("Academic Year 2026–2027", align=WD_ALIGN_PARAGRAPH.CENTER, space_after=20, size=11)
@@ -645,8 +646,8 @@ def generate_cu_pdf():
                            "<b>(DATA SCIENCE AND ARTIFICIAL INTELLIGENCE)</b>", ParagraphStyle('Deg', parent=body_style, alignment=1, fontSize=10.5, leading=15, spaceAfter=24)))
 
     if os.path.exists(CU_LOGO):
-        story.append(RLImage(CU_LOGO, width=4.0*inch, height=1.2*inch))
-        story.append(Spacer(1, 12))
+        story.append(RLImage(CU_LOGO, width=3.2*inch, height=1.14*inch, hAlign='CENTER'))
+        story.append(Spacer(1, 14))
 
     story.append(Paragraph("<b>Chandigarh University</b><br/>Academic Year 2026–2027", ParagraphStyle('CU', parent=body_style, alignment=1, fontSize=11, leading=15)))
     story.append(PageBreak())
